@@ -1,15 +1,16 @@
-﻿using System;
+﻿using FlashCard.Data;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace FlashCard.Dto
 {
-    public partial class CourseReadDto
+    public partial class CourseReadDto : BaseDto
     {
-
-        [Required]
-        [StringLength(100)]
         public string Name { get; set; }
+
+        public ICollection<CardReadDto> Cards { get; set; }
+        //public ICollection<Card> Cards { get; set; }
 
     }
 }

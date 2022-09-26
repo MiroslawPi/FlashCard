@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using FlashCard.Data;
 using FlashCard.Dto;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace FlashCard.Controllers
 {
@@ -40,8 +41,15 @@ namespace FlashCard.Controllers
         public async Task<ActionResult<IEnumerable<CourseReadDto>>> GetCourses()
         {
             //return await _context.Courses.ToListAsync();
-            var courses = await _context.Courses.ToListAsync();
-            var coursesDto = mapper.Map<IEnumerable<CourseReadDto>>(courses);
+
+            //var courses = await _context.Courses.Include(x => x.Cards).ToListAsync();
+            //var coursesDto = mapper.Map<IEnumerable<CourseReadDto>>(courses);
+            //return Ok(coursesDto)
+
+            var coursesDto = await _context.Courses
+                          .Include(x => x.Cards)
+                          .ProjectTo<CourseReadDto>(mapper.ConfigurationProvider).ToListAsync();
+;            
             return Ok(coursesDto);
         }
 
