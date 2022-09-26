@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashCard", "FlashCard\FlashCard.csproj", "{B4A7F605-B18A-446B-B992-9D86B5B8FA7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashCard.Api", "FlashCard.Api\FlashCard.Api.csproj", "{88EAAE68-00FE-4EFC-8356-744CC0FA1B2F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16} = {3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashCard.Infastructure", "FlashCard.Infastructure\FlashCard.Infastructure.csproj", "{3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlashCard.Core", "FlashCard.Core\FlashCard.Core.csproj", "{D6F3C4A6-8CF7-486F-9316-413CB754AB3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +18,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B4A7F605-B18A-446B-B992-9D86B5B8FA7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B4A7F605-B18A-446B-B992-9D86B5B8FA7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B4A7F605-B18A-446B-B992-9D86B5B8FA7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B4A7F605-B18A-446B-B992-9D86B5B8FA7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88EAAE68-00FE-4EFC-8356-744CC0FA1B2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88EAAE68-00FE-4EFC-8356-744CC0FA1B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88EAAE68-00FE-4EFC-8356-744CC0FA1B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88EAAE68-00FE-4EFC-8356-744CC0FA1B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C7E5A80-FCE4-4FCD-B81D-AED7B36E4C16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6F3C4A6-8CF7-486F-9316-413CB754AB3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6F3C4A6-8CF7-486F-9316-413CB754AB3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6F3C4A6-8CF7-486F-9316-413CB754AB3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6F3C4A6-8CF7-486F-9316-413CB754AB3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
