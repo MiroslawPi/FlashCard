@@ -3,9 +3,8 @@ using System.Collections.Generic;
 
 namespace FlashCard.Core.Domain
 {
-    public partial class Card
+    public partial class Card : BaseEntity
     {
-        public Guid Id { get; set; }
         public string? FrontWord { get; set; }
         public string? BackWord { get; set; }
         public string? FrontDescription { get; set; }

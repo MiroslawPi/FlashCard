@@ -4,6 +4,7 @@ using AutoMapper;
 using FlashCard.Infastructure.Data;
 using FlashCard.Infastructure.Dto;
 using FlashCard.Core.Domain;
+using FlashCard.Core.Repositories;
 
 namespace FlashCard.Api.Controllers
 {
@@ -11,69 +12,46 @@ namespace FlashCard.Api.Controllers
     [ApiController]
     public class CardsController : ControllerBase
     {
-        private readonly FlashCardDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly ICardService _cardService;
 
-        public CardsController(FlashCardDbContext context, IMapper mapper)
+        public CardsController(ICardService cardService)
         {
-            _context = context;
-            _mapper = mapper;
+            _cardService = cardService;
         }
 
         // GET: api/Cards/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CardReadDto>> GetCard(Guid id)
         {
-            var card = await _context.Cards.FindAsync(id);
+            var cardReadDto = await _cardService.GetAsync(id);
 
-            if (card == null)
+            if (cardReadDto == null)
             {
                 return NotFound();
             }
 
-            var cardDto = _mapper.Map<CardReadDto>(card);
-
-            return Ok(cardDto);
+            return Ok(cardReadDto);
         }
 
         // GET: api/Cards
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CardReadDto>>> GetCards()
+        public async Task<ActionResult<IEnumerable<CardReadDto>>> GetCards(string? name)
         {
-            //return await _context.Cards.ToListAsync();
-            var cards = await _context.Cards.ToListAsync();
-            var cardsDto = _mapper.Map<IEnumerable<CardReadDto>>(cards);
-            return Ok(cardsDto);
+            var cardReadDtos = await _cardService.BrowseAsync(name);
+            return Ok(cardReadDtos);
         }
 
         // POST: api/Cards
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<CardCreateDto>> PostCard(CardCreateDto cardDto)
+        public async Task<ActionResult<CardCreateDto>> PostCard(CardCreateDto cardCreateDto)
         {
-            var card = _mapper.Map<Card>(cardDto);
-            await _context.Cards.AddAsync(card);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (CardExists(card.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _cardService.AddAsync(cardCreateDto);
 
-            return CreatedAtAction(nameof(GetCard), new { id = card.Id }, card);
+            //return CreatedAtAction(nameof(GetCard), new { id = card.Id }, card);
+            return Ok(NoContent());
         }
 
         // PUT: api/Cards/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCard(Guid id, CardUpdateDto cardUpdateDto)
         {
@@ -82,32 +60,14 @@ namespace FlashCard.Api.Controllers
                 return BadRequest();
             }
 
-            var card = await _context.Cards.FindAsync(id);
+            var cardReadDto = await _cardService.GetAsync(id);
 
-            if(card == null)
+            if(cardReadDto == null)
                 {
                     return NotFound();
                 }
 
-            _mapper.Map(cardUpdateDto, card);
-
-            _context.Entry(card).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CardExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _cardService.UpdateAsync(cardUpdateDto);
 
             return Ok(NoContent());
         }
@@ -116,21 +76,16 @@ namespace FlashCard.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCard(Guid id)
         {
-            var card = await _context.Cards.FindAsync(id);
-            if (card == null)
+            var cardReadDto = await _cardService.GetAsync(id);
+            if (cardReadDto == null)
             {
                 return NotFound();
             }
 
-            _context.Cards.Remove(card);
-            await _context.SaveChangesAsync();
+            await _cardService.DeleteAsync(id);
 
             return NoContent();
         }
 
-        private bool CardExists(Guid id)
-        {
-            return _context.Cards.Any(e => e.Id == id);
-        }
     }
 }

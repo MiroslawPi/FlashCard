@@ -3,14 +3,14 @@ using System.Collections.Generic;
 
 namespace FlashCard.Core.Domain
 {
-    public partial class Course
+    public partial class Course : BaseEntity
     {
         public Course()
         {
             Cards = new HashSet<Card>();
         }
 
-        public Guid Id { get; set; }
+        
         public string? Name { get; set; }
         public DateTime Created { get; set; }
 

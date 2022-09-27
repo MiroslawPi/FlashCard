@@ -5,6 +5,9 @@ using AutoMapper.QueryableExtensions;
 using FlashCard.Infastructure.Data;
 using FlashCard.Infastructure.Dto;
 using FlashCard.Core.Domain;
+using FlashCard.Core.Repositories;
+using FlashCard.Infastructure.Services;
+using System.Xml.Linq;
 
 namespace FlashCard.Api.Controllers
 {
@@ -12,83 +15,47 @@ namespace FlashCard.Api.Controllers
     [ApiController]
     public class CoursesController : ControllerBase
     {
-        private readonly FlashCardDbContext _context;
-        private readonly IMapper mapper;
+        private readonly ICourseService _courseService;
 
-        public CoursesController(FlashCardDbContext context, IMapper mapper)
+        public CoursesController(ICourseService courseService)
         {
-            _context = context;
-            this.mapper = mapper;
+            _courseService = courseService;
         }
 
         // GET: api/Courses/5
         [HttpGet("{id}")]
         public async Task<ActionResult<CourseReadDto>> GetCourse(Guid id)
         {
-            var course = await _context.Courses.FindAsync(id);
+            var couseReadDto = await _courseService.GetAsync(id);
 
-            if (course == null)
+            if (couseReadDto == null)
             {
                 return NotFound();
             }
 
-            //return course;
-            var courseDto = mapper.Map<CourseReadDto>(course);
-            return Ok(courseDto);
+            return Ok(couseReadDto);
         }
 
         // GET: api/Courses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CourseReadDto>>> GetCourses()
+        public async Task<ActionResult<IEnumerable<CourseReadDto>>> GetCourses(string? name)
         {
-            //return await _context.Courses.ToListAsync();
-
-            //var courses = await _context.Courses.Include(x => x.Cards).ToListAsync();
-            //var coursesDto = mapper.Map<IEnumerable<CourseReadDto>>(courses);
-            //return Ok(coursesDto)
-
-            var coursesDto = await _context.Courses
-                          .Include(x => x.Cards)
-                          .ProjectTo<CourseReadDto>(mapper.ConfigurationProvider).ToListAsync();
-;            
-            return Ok(coursesDto);
+            var courseReadDtos = await _courseService.BrowseAsync(name);
+            return Ok(courseReadDtos);
         }
 
         // POST: api/Courses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        //public async Task<ActionResult<Course>> PostCourse(Course course)
-        public async Task<ActionResult<CourseCreateDto>> PostCourse(CourseCreateDto courseDto)
+        public async Task<ActionResult<CourseCreateDto>> PostCourse(CourseCreateDto courseCreateDto)
         {
-            //_context.Courses.Add(course);
+            await _courseService.AddAsync(courseCreateDto);
 
-            var course = mapper.Map<Course>(courseDto);
-            await _context.Courses.AddAsync(course);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                //if (CourseExists(course.Id))
-                if (await CourseExists(course.Id))
-                {
-                    return Conflict();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            //return CreatedAtAction("GetCourse", new { id = course.Id }, course);
-            return CreatedAtAction(nameof(GetCourse), new { id = course.Id }, course);
+            //return CreatedAtAction(nameof(GetCard), new { id = card.Id }, card);
+            return Ok(NoContent());
         }
 
         // PUT: api/Courses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        //public async Task<IActionResult> PutCourse(Guid id, Course course)
         public async Task<IActionResult> PutCourse(Guid id, CourseUpdateDto courseUpdateDto)
         {
             if (id != courseUpdateDto.Id)
@@ -96,33 +63,14 @@ namespace FlashCard.Api.Controllers
                 return BadRequest();
             }
 
-            var course = await _context.Courses.FindAsync(id);
+            var cardReadDto = await _courseService.GetAsync(id);
 
-            if (course == null)
+            if (cardReadDto == null)
             {
                 return NotFound();
             }
 
-            mapper.Map(courseUpdateDto, course);
-
-            _context.Entry(course).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                //if (!CourseExists(id))
-                if (!await CourseExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _courseService.UpdateAsync(courseUpdateDto);
 
             return Ok(NoContent());
         }
@@ -131,23 +79,16 @@ namespace FlashCard.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCourse(Guid id)
         {
-            var course = await _context.Courses.FindAsync(id);
-            if (course == null)
+            var courseReadDto = await _courseService.GetAsync(id);
+            if (courseReadDto == null)
             {
                 return NotFound();
             }
 
-            _context.Courses.Remove(course);
-            await _context.SaveChangesAsync();
+            await _courseService.DeleteAsync(id);
 
-            return Ok(NoContent());
+            return NoContent();
         }
 
-        //private bool CourseExists(Guid id)
-        private async Task<bool> CourseExists(Guid id)
-        {
-            //return _context.Courses.Any(e => e.Id == id)
-            return await _context.Courses.AnyAsync(e => e.Id == id);
-        }
     }
 }

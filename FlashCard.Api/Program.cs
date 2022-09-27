@@ -1,5 +1,8 @@
 using FlashCard.Configuration;
+using FlashCard.Core.Repositories;
 using FlashCard.Infastructure.Data;
+using FlashCard.Infastructure.Repositories;
+using FlashCard.Infastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +15,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //added by mp
+
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICardRepository, CardRepository>();
+builder.Services.AddScoped<ICardService, CardService>();
 
 var connString = builder.Configuration.GetConnectionString("FlashCardDbConnections");
 builder.Services.AddDbContext<FlashCardDbContext>(options => options.UseSqlServer(connString));

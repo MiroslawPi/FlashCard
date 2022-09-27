@@ -17,6 +17,8 @@ namespace FlashCard.Infastructure.Dto
 
         [StringLength(1000)]
         public string BackDescription { get; set; }
+        [Required]
+        public Guid CourseId { get; set; }
 
     }
 }
