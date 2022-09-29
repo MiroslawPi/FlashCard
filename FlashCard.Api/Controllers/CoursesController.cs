@@ -11,7 +11,8 @@ using System.Xml.Linq;
 
 namespace FlashCard.Api.Controllers
 {
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class CoursesController : ControllerBase
     {
@@ -55,15 +56,18 @@ namespace FlashCard.Api.Controllers
         }
 
         // PUT: api/Courses/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCourse(Guid id, CourseUpdateDto courseUpdateDto)
+        //[HttpPut("{id}")]
+        [HttpPut]
+        //public async Task<IActionResult> PutCourse(Guid id, CourseUpdateDto courseUpdateDto)
+        public async Task<IActionResult> PutCourse(CourseUpdateDto courseUpdateDto)
         {
-            if (id != courseUpdateDto.Id)
-            {
-                return BadRequest();
-            }
+            //if (id != courseUpdateDto.Id)
+            //{
+            //    return BadRequest();
+            //}
 
-            var cardReadDto = await _courseService.GetAsync(id);
+            //var cardReadDto = await _courseService.GetAsync(id);
+            var cardReadDto = await _courseService.GetAsync(courseUpdateDto.Id);
 
             if (cardReadDto == null)
             {

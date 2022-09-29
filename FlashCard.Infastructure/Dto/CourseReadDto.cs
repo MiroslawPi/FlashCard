@@ -7,5 +7,7 @@
         public ICollection<CardReadDto> Cards { get; set; }
         //public ICollection<Card> Cards { get; set; }
 
+        public int Number { get { return Cards.Count; } }
+
     }
 }

@@ -2,15 +2,15 @@
   <div>
     <v-card max-width="600" class="mx-auto grey darken-3">
       <v-card-title class="text-h5 black justify-center">
-        {{ list.id === '00000000-0000-0000-0000-000000000000' ? 'Nowa lista:' : 'Edycja listy:' }}
-        <!-- {{ list }} -->
+        {{ course.id === '00000000-0000-0000-0000-000000000000' ? 'Nowa kurs:' : 'Edycja kursu:' }}
+        <!-- {{ course }} -->
       </v-card-title>
       <v-form>
         <v-card-text>
           <div class="d-flex flex-column flex-sm-row">
             <v-text-field
-              v-model="list.name"
-              label="Nazwa listy"
+              v-model="course.name"
+              label="Nazwa kursu"
               outlined
               dense
               class="mx-1"
@@ -18,8 +18,8 @@
           </div>
           <div class="d-flex flex-column flex-sm-row">
             <v-text-field
-              v-model="list.description"
-              label="Opis listy"
+              v-model="course.description"
+              label="Opis kursu"
               outlined
               dense
               class="mx-1"
@@ -32,7 +32,7 @@
             <v-spacer />
             <v-btn
               color="primary"
-              @click.stop="$emit('save', list)"
+              @click.stop="$emit('save', course)"
             >
               Zapisz
             </v-btn>
@@ -48,7 +48,7 @@ export default {
   props: ['id'],
   data () {
     return {
-      list: { id: '00000000-0000-0000-0000-000000000000', name: '', description: '' },
+      course: { id: '00000000-0000-0000-0000-000000000000', name: '', description: '' },
       confirmdel: false,
       orgName: ''
     }
@@ -59,9 +59,9 @@ export default {
       this.id !== '00000000-0000-0000-0000-000000000000' &&
       this.id !== null // bo problem 2 edycja
     ) {
-      this.$axios.get(`/api/ListOfTasks/${this.id}`)
+      this.$axios.get(`/api/Courses/${this.id}`)
         .then((response) => {
-          this.list = response.data
+          this.course = response.data
 
           // this.refactorColumn()
         })

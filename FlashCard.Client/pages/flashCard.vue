@@ -2,7 +2,8 @@
   <div>
     <v-card outlined>
       <v-card-title>
-        ToDo - Task List <!--  {{ taskListId }} -->
+        Flashcards, Fiszki   <!-- {{ items }} -->
+        <!-- <v-btn color="success" small class="mx-1" @click="getGenerated()">Odśwież</v-btn> -->
       </v-card-title>
     </v-card>
     <v-card v-if="showTable" outlined>
@@ -11,9 +12,9 @@
           color="primary"
           @click="editItem('00000000-0000-0000-0000-000000000000')"
         >
-          Dodaj listę
+          Dodaj Kurs
         </v-btn>
-        <v-spacer /> Tabela listy zadań ToDo
+        <v-spacer />
         <v-spacer />
         <v-text-field
           v-model="search"
@@ -36,12 +37,12 @@
           <v-btn
             small
             color="primary"
-            @click.stop="editTask('00000000-0000-0000-0000-000000000000', item.id)"
+            @click.stop="editCard('00000000-0000-0000-0000-000000000000', item.id)"
           >
             <v-icon small>
               mdi-calendar-check
             </v-icon>
-            Dodaj taska
+            Dodaj fiszkę
           </v-btn>
           <v-btn
             small
@@ -53,7 +54,7 @@
             </v-icon>
             Edycja
           </v-btn>
-          <v-btn color="error" small class="mx-1" @click="deleteList(item.id)">
+          <v-btn color="error" small class="mx-1" @click="deleteCourse(item.id)">
             <v-icon small>
               mdi-delete-forever
             </v-icon>
@@ -62,26 +63,26 @@
         </template>
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length">
-            <list-of-tasks-detail :item="item" @editTask="editTask" @updateTask="updateTask" @deleteTask="deleteTask"/>
+            <course-detail :item="item" @editCard="editCard" @updateCard="updateCard" @deleteCard="deleteCard" />
           </td>
         </template>
       </v-data-table>
       <v-dialog v-model="showEditor" max-width="600">
-        <list-of-tasks-editor
+        <course-editor
           :id="itemId"
           :key="itemId"
           @cancel="cancelItem"
-          @save="saveList"
-          @deleteList="deleteList"
+          @save="saveCourse"
+          @deleteCourse="deleteCourse"
         />
       </v-dialog>
-      <v-dialog v-model="showTaskEditor" max-width="600">
-        <task-editor
-          :id="taskId"
-          :key="taskId"
-          @cancel="cancelTask"
-          @save="saveTask"
-          @deleteTask="deleteTask"
+      <v-dialog v-model="showCardEditor" max-width="600">
+        <card-editor
+          :id="cardId"
+          :key="cardId"
+          @cancel="cancelCard"
+          @save="saveCard"
+          @deleteCard="deleteCard"
         />
       </v-dialog>
     </v-card>
@@ -89,88 +90,88 @@
 </template>
 
 <script>
-import ListOfTasksDetail from '~/components/ListOfTasksDetail.vue'
+import CourseDetail from '~/components/CourseDetail.vue'
 export default {
-  components: { ListOfTasksDetail },
+  components: { CourseDetail },
   data: () => ({
     headers: [
       { value: 'name', text: 'Nazwa', sortable: true },
       { value: 'description', text: 'Opis', sortable: true },
-      { value: 'czasGenModForRead', text: 'Utworzono', sortable: true },
+      { value: 'number', text: 'Liczba', sortable: true },
       { value: 'id', text: 'Operacje', sortable: false },
-      { text: 'Taski', value: 'data-table-expand' }
+      { text: 'Fiszki', value: 'data-table-expand' }
     ],
     items: [],
     name: '',
     description: '',
-    task: { listId: null, taskName: null, taskDescription: null },
+    card: { listId: null, cardName: null, cardDescription: null },
     options: {},
-    listOfTasks: {},
+    listOfcards: {},
     showEditor: false,
-    showTaskEditor: false,
+    showCardEditor: false,
     expanded: [],
     search: '',
     componentKey: 0,
-    componentKeyTask: 0,
+    componentKeycard: 0,
     confirmdel: false,
     showTable: true,
     itemId: null,
-    taskId: null,
-    taskListId: null
+    cardId: null,
+    cardListId: null
   }),
   async fetch () {
     await this.getGenerated()
   },
   methods: {
     async getGenerated () {
-      await this.$axios.get('/api/ListOfTasks')
+      await this.$axios.get('/api/Courses/')
         .then((response) => {
           this.items = response.data
 
-          this.refactorColumn()
+          // this.refactorColumn()
         })
         .catch((error) => {
           console.log(error)
           this.errorMsg = 'Error geting data'
         })
     },
-    refactorColumn () {
-      for (let i = 0; i < this.items.length; i++) {
-        this.items[i].czasGenModForRead = new Date(this.items[i].created).toISOString().slice(0, 10) + ' ' + new Date(this.items[i].created).getHours() + ':' + new Date(this.items[i].created).getMinutes()
-      }
-    },
+    // refactorColumn () {
+    //   for (let i = 0; i < this.items.length; i++) {
+    //     this.items[i].czasGenModForRead = new Date(this.items[i].created).toISOString().slice(0, 10) + ' ' + new Date(this.items[i].created).getHours() + ':' + new Date(this.items[i].created).getMinutes()
+    //   }
+    // },
     editItem (id) {
       this.itemId = id
       this.showEditor = true
     },
-    editTask (id, taskListId) {
-      this.taskId = id
-      this.taskListId = taskListId
-      this.showTaskEditor = true
+    editCard (id, cardListId) {
+      this.cardId = id
+      this.cardListId = cardListId
+      this.showCardEditor = true
     },
     cancelItem () {
       this.itemId = null
-      this.taskListId = null
+      this.cardListId = null
       this.showEditor = false
     },
-    cancelTask () {
-      this.taskId = null
-      this.showTaskEditor = false
+    cancelCard () {
+      this.cardId = null
+      this.showCardEditor = false
     },
-    async saveList (item) {
+    async saveCourse (item) {
       if (item.id === '00000000-0000-0000-0000-000000000000') {
         try {
-          await this.$axios.$post('/api/ListOfTasks/', JSON.stringify({ name: item.name, description: item.description }), {
+          await this.$axios.$post('/api/Courses/', JSON.stringify({ name: item.name, description: item.description }), {
             headers: {
               'Content-Type': 'application/json'
             }
           })
         } catch (error) {
-          this.errorMsg = 'Error geting data'
+          this.errorMsg = 'Error posting data'
         }
       } else {
         try {
-          await this.$axios.$put('/api/ListOfTasks/', JSON.stringify({ id: item.id, name: item.name, description: item.description }), {
+          await this.$axios.$put('/api/Courses/', JSON.stringify({ id: item.id, name: item.name, description: item.description }), {
             headers: {
               'Content-Type': 'application/json'
             }
@@ -184,10 +185,10 @@ export default {
       this.itemId = null
       this.$fetch()
     },
-    async saveTask (item) {
+    async saveCard (item) {
       if (item.id === '00000000-0000-0000-0000-000000000000') {
         try {
-          await this.$axios.$post('/api/TaskFromList/', JSON.stringify({ id: item.id, listId: this.taskListId, name: item.name, description: item.description }), {
+          await this.$axios.$post('/api/Courses/', JSON.stringify({ id: item.id, listId: this.cardListId, name: item.name, description: item.description }), {
             headers: {
               'Content-Type': 'application/json'
             }
@@ -197,7 +198,7 @@ export default {
         }
       } else {
         try {
-          await this.$axios.$put('/api/TaskFromList/', JSON.stringify({ id: item.id, name: item.name, description: item.description }), {
+          await this.$axios.$put('/api/Courses/', JSON.stringify({ id: item.id, name: item.name, description: item.description }), {
             headers: {
               'Content-Type': 'application/json'
             }
@@ -207,22 +208,22 @@ export default {
         }
       }
 
-      this.showTaskEditor = false
-      this.taskId = null
+      this.showCardEditor = false
+      this.cardId = null
       this.$fetch()
     },
-    async deleteList (id) {
+    async deleteCourse (id) {
       try {
-        await this.$axios.$delete(`/api/ListOfTasks/${id}`)
+        await this.$axios.$delete(`/api/Courses/${id}`)
       } catch (error) {
         this.errorMsg = 'Error putting data'
       }
       this.showEditor = false
       this.$fetch()
     },
-    async deleteTask (id, listId) {
+    async deleteCard (id, listId) {
       try {
-        await this.$axios.$delete('/api/TaskFromList/',
+        await this.$axios.$delete('/api/cardFromList/',
           {
             headers: {
               'Content-Type': 'application/json'
@@ -238,9 +239,9 @@ export default {
       }
       this.$fetch()
     },
-    async updateTask (id, name, description, completed) {
+    async updateCard (id, name, description, completed) {
       try {
-        await this.$axios.$put('/api/TaskFromList/', JSON.stringify({ id, name, description, completed }), {
+        await this.$axios.$put('/api/cardFromList/', JSON.stringify({ id, name, description, completed }), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -249,9 +250,9 @@ export default {
         this.errorMsg = 'Error geting data'
       }
     },
-    async addTask () {
+    async addcard () {
       try {
-        await this.$axios.$post('/api/ListOfTasks/task', JSON.stringify({ listId: this.task.listId, taskName: this.task.taskName, taskDescription: this.task.taskDescription }), {
+        await this.$axios.$post('/api/ListOfcards/card', JSON.stringify({ listId: this.card.listId, cardName: this.card.cardName, cardDescription: this.card.cardDescription }), {
           headers: {
             'Content-Type': 'application/json'
           }
@@ -260,7 +261,7 @@ export default {
         this.errorMsg = 'Error geting data'
       }
       this.getGenerated()
-      this.task = null
+      this.card = null
     }
   }
 }

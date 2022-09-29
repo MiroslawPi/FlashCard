@@ -109,8 +109,8 @@ export default {
         },
         {
           icon: 'mdi-sync',
-          title: 'ToDO',
-          to: '/toDo'
+          title: 'Flashcards',
+          to: '/flashcard'
         }
       ],
       miniVariant: false,
